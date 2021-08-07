@@ -12,7 +12,7 @@ import (
 const usage = "Usage: define <word>"
 
 func main() {
-	if len(os.Args) < 2 {
+	if len(os.Args) != 2 {
 		fmt.Println(usage)
 		return
 	}
