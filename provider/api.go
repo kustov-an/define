@@ -2,6 +2,7 @@ package provider
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 
@@ -13,6 +14,9 @@ const baseUrl = "https://api.dictionaryapi.dev/api/v2/entries/en_US/"
 type ApiProvider struct {
 	Client *http.Client
 }
+
+var ErrorNetwork = errors.New("network error")
+var ErrorMissingDefinition = errors.New("missing definition")
 
 type Response struct {
 	Meanings []struct {
@@ -36,20 +40,20 @@ func (a *ApiProvider) Define(word string) (common.Definition, error) {
 	url := baseUrl + word
 	resp, err := a.Client.Get(url)
 	if err != nil {
-		return common.Definition{}, err
+		return common.Definition{}, ErrorNetwork
 	}
 	defer resp.Body.Close()
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return common.Definition{}, err
+		return common.Definition{}, ErrorNetwork
 	}
 
 	response := []Response{}
 	err = json.Unmarshal(bytes, &response)
 	if err != nil {
-		return common.Definition{}, err
+		return common.Definition{}, ErrorMissingDefinition
 	}
 	return common.Definition{
-		response[0].toArray(),
+		Meanings: response[0].toArray(),
 	}, nil
 }

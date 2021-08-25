@@ -1,7 +1,8 @@
 package main
 
 import (
-	"log"
+	"fmt"
+	"os"
 
 	"github.com/kustov-an/define/common"
 )
@@ -21,8 +22,10 @@ type Command struct {
 
 func (c *Command) run(word string) {
 	defintion, err := c.provider.Define(word)
+
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
 	}
 	c.printer.Print(defintion)
 }
