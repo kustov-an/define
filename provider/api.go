@@ -20,17 +20,23 @@ var ErrorMissingDefinition = errors.New("missing definition")
 
 type Response struct {
 	Meanings []struct {
-		Definitions []struct {
-			Definition string `json:"definition"`
+		PartOfSpeech string `json:"partOfSpeech"`
+		Definitions  []struct {
+			Definition string   `json:"definition"`
+			Synonyms   []string `json:"synonyms"`
 		} `json:"definitions"`
 	} `json:"meanings"`
 }
 
-func (r *Response) toArray() []string {
-	result := []string{}
+func (r *Response) toArray() []common.Meaning {
+	result := []common.Meaning{}
 	for _, meaning := range r.Meanings {
 		for _, definition := range meaning.Definitions {
-			result = append(result, definition.Definition)
+			result = append(result, common.Meaning{
+				PartOfSpeech: meaning.PartOfSpeech,
+				Meaning:      definition.Definition,
+				Synonyms:     definition.Synonyms,
+			})
 		}
 	}
 	return result
